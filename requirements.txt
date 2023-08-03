@@ -1,0 +1,7 @@
+fastapi
+psycopg2
+pymongo
+uvicorn
+uuid
+base64
+bcrypt
