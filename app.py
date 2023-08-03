@@ -16,16 +16,6 @@ mongo_db = create_mongo_connection()
 def home():
     return {"message":"go to /user end point"}
 
-def hash_password(password: str) -> str:
-    # Hash the password 
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    return hashed_password.decode('utf-8')
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Check if the plain password matches the hashed password 
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-
-
 def check_email_exists_in_postgres(email):
     try:
         connection = create_postgres_connection()
@@ -45,9 +35,8 @@ def save_user_to_postgres(full_name, email, password, phone):
         cursor = connection.cursor()
         user_id = str(uuid4())
 
-        hashed_password = hash_password(password)
 
-        cursor.execute("INSERT INTO users (id, first_name, hashed_password, email, phone) VALUES (%s, %s, %s, %s, %s)",
+        cursor.execute("INSERT INTO users (id, first_name, password, email, phone) VALUES (%s, %s, %s, %s, %s)",
                        (user_id, full_name.split()[0], password, email, phone))
         connection.commit()
         cursor.close()
@@ -112,6 +101,7 @@ def get_all_users():
         user_dict = {
             'user_id': user_data[0],
             'full_name': user_data[1],
+            'password': user_data[2],
             'email': user_data[3],
             'phone': user_data[4]
         }
@@ -120,7 +110,7 @@ def get_all_users():
     return user_list
 
 
-@app.post('/user/', response_class=HTMLResponse)
+@app.post('/user/')
 def register_user(full_name: str, email: str, password: str, phone: str, profile_picture: UploadFile = File(...)):
     # Check if email already exists in PostgreSQL
     if check_email_exists_in_postgres(email):
@@ -168,7 +158,6 @@ def get_registered_user_details(user_id: str):
         user_data_dict['profile_picture'] = None
 
     return user_data_dict
-
 
 if __name__ == '__main__':
     import uvicorn
