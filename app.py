@@ -1,13 +1,10 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from uuid import uuid4
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-import base64, bcrypt
+import base64
 from db import create_postgres_connection,create_mongo_connection
 
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 
 connection = create_postgres_connection()
 mongo_db = create_mongo_connection()
@@ -36,8 +33,8 @@ def save_user_to_postgres(full_name, email, password, phone):
         user_id = str(uuid4())
 
 
-        cursor.execute("INSERT INTO users (id, first_name, password, email, phone) VALUES (%s, %s, %s, %s, %s)",
-                       (user_id, full_name.split()[0], password, email, phone))
+        cursor.execute("INSERT INTO users (id, full_name, password, email, phone) VALUES (%s, %s, %s, %s, %s)",
+                       (user_id, full_name, password, email, phone))
         connection.commit()
         cursor.close()
         connection.close()

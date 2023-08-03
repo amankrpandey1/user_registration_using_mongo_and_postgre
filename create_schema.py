@@ -10,7 +10,7 @@ def create_postgres_tables():
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id UUID PRIMARY KEY,
-                first_name VARCHAR(100) NOT NULL,
+                full_name VARCHAR(100) NOT NULL,
                 password VARCHAR(100) NOT NULL,
                 email VARCHAR(100) UNIQUE NOT NULL,
                 phone VARCHAR(20) NOT NULL
